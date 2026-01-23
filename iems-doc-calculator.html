@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>International Express Mail Services (Documents)</title>
+  <style>
+    :root {
+      --primary: #4a6bff;
+      --primary-dark: #3a5bff;
+      --dark: #2c3e50;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7ff;
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: auto; /* Enable horizontal scrolling for entire page */
+    }
+
+    .container {
+      min-width: 1200px; /* Minimum width to ensure table is fully visible */
+      margin: 30px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .date-time {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-size: 14px;
+      color: #666;
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #e0e3ff;
+      white-space: nowrap;
+    }
+
+    .search-filter {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .filter-box {
+      min-width: 200px;
+    }
+
+    .search-box input, .filter-box select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e3ff;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .search-box input:focus, .filter-box select:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    .table-container {
+      overflow-x: visible;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #e0e3ff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #e0e3ff;
+      padding: 12px 10px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    th {
+      background-color: var(--primary);
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    td {
+      background-color: white;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8f9fa;
+    }
+
+    tr:hover td {
+      background-color: #f0f4ff;
+    }
+
+    .country-col {
+      text-align: left;
+      font-weight: 500;
+      position: sticky;
+      left: 0;
+      background-color: white;
+      border-right: 2px solid #e0e3ff;
+      min-width: 250px;
+      z-index: 5;
+    }
+
+    tr:hover .country-col {
+      background-color: #f0f4ff;
+    }
+
+    .weight-header {
+      background-color: var(--primary-dark);
+    }
+
+    /* Column widths */
+    th:nth-child(1) { width: 250px; }
+    th:nth-child(2) { width: 150px; }
+    th:nth-child(3) { width: 180px; }
+    th:nth-child(4) { width: 180px; }
+    th:nth-child(5) { width: 180px; }
+    th:nth-child(6) { width: 180px; }
+    th:nth-child(7) { width: 180px; }
+
+    /* Highlight matching search results */
+    .highlight {
+      background-color: #fff9c4 !important;
+      font-weight: bold;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 1200px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        min-width: 100%;
+        margin: 15px auto;
+        padding: 15px;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+      }
+      
+      table {
+        min-width: 1100px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .date-time {
+        position: static;
+        text-align: center;
+        margin: 0 auto 15px;
+        max-width: 100%;
+        white-space: normal;
+      }
+      
+      .search-filter {
+        flex-direction: column;
+      }
+      
+      .search-box, .filter-box {
+        min-width: 100%;
+      }
+      
+      .table-container {
+        font-size: 14px;
+      }
+      
+      th, td {
+        padding: 8px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="date-time">
+      <span id="currentDate"></span> <span id="currentTime"></span>
+    </div>
+
+    <h1>International Express Mail Services (Documents)</h1>
+
+    <div class="search-filter">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search for a country..." />
+      </div>
+      <div class="filter-box">
+        <select id="regionFilter">
+          <option value="all">All Regions</option>
+          <option value="asia">Asia</option>
+          <option value="europe">Europe</option>
+          <option value="americas">Americas</option>
+          <option value="middle-east">Middle East</option>
+          <option value="oceania">Oceania</option>
+          <option value="africa">Africa</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="ratesTable">
+        <thead>
+          <tr>
+            <th class="country-col">Country</th>
+            <th class="weight-header">Up to 250g</th>
+            <th class="weight-header">Above 250g up to 500g</th>
+            <th class="weight-header">Above 500g up to 750g</th>
+            <th class="weight-header">Above 750g up to 1000g</th>
+            <th class="weight-header">Above 1000g up to 1500g</th>
+            <th class="weight-header">Above 1500g up to 2000g</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Table rows will be generated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Update date and time
+    function updateDateTime() {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      const dateString = now.toLocaleDateString('en-US', options);
+      let hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      const timeString = `${hours}:${minutes} ${ampm}`;
+      
+      document.getElementById('currentDate').textContent = `Today is ${dateString}`;
+      document.getElementById('currentTime').textContent = timeString;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+
+    // Rate data from the PDF
+    const ratesData = [
+      { country: "Australia", region: "oceania", rates: [1528, 1597, 1665, 1733, 2178, 2622] },
+      { country: "Austria", region: "europe", rates: [1341, 1428, 1601, 2231, 2738, 3245] },
+      { country: "Bahrain (Kingdom)", region: "middle-east", rates: [1372, 1460, 1632, 1973, 2335.5, 2698] },
+      { country: "Bangladesh", region: "asia", rates: [1269, 1363, 1547, 3048, 3410.5, 3773] },
+      { country: "Belgium", region: "europe", rates: [1247, 1335, 1507, 2031, 2485, 2939] },
+      { country: "Brazil", region: "americas", rates: [1603, 1697, 1881, 2592, 3153, 3714] },
+      { country: "Brunei Darussalam", region: "asia", rates: [873, 960, 1133, 1603, 1909, 2215] },
+      { country: "Bulgaria", region: "europe", rates: [935, 1023, 1195, 1809, 2308, 2807] },
+      { country: "Cambodia", region: "asia", rates: [873, 960, 1132, 1418, 1753, 2088] },
+      { country: "Canada", region: "americas", rates: [1181, 1269, 1441, 2301, 2894, 3487] },
+      { country: "China (People's Rep.)", region: "asia", rates: [754, 842, 1014, 1581, 2048, 2515] },
+      { country: "Cyprus", region: "europe", rates: [1247, 1335, 1507, 2107, 2599, 3091] },
+      { country: "Denmark", region: "europe", rates: [1996, 2084, 2256, 2874, 3375, 3876] },
+      { country: "Egypt", region: "africa", rates: [1122, 1210, 1382, 1845, 2268, 2691] },
+      { country: "Finland (inc. Aland Islands)", region: "europe", rates: [1697, 1784, 1956, 2570, 3069, 3568] },
+      { country: "France", region: "europe", rates: [1308, 1396, 1568, 2031, 2518, 3005] },
+      { country: "Germany", region: "europe", rates: [2370, 2458, 2630, 3093, 3546.5, 4000] },
+      { country: "Greece", region: "europe", rates: [1372, 1460, 1632, 2094, 2517, 2940] },
+      { country: "Hong Kong, China", region: "asia", rates: [692, 764, 906, 1141, 1381, 1621] },
+      { country: "India", region: "asia", rates: [1210, 1297, 1469, 1755, 2146, 2537] },
+      { country: "Indonesia", region: "asia", rates: [749, 824, 972, 1217, 1492.5, 1768] },
+      { country: "Iran (Islamic Rep.)", region: "middle-east", rates: [1497, 1584, 1756, 2058, 2463.5, 2869] },
+      { country: "Ireland", region: "europe", rates: [1497, 1584, 1757, 2219, 2642, 3065] },
+      { country: "Italy", region: "europe", rates: [1587, 1684, 1874, 2386, 2809, 3232] },
+      { country: "Japan", region: "asia", rates: [829, 904, 1052, 2146, 2481, 2816] },
+      { country: "Jordan", region: "middle-east", rates: [1372, 1460, 1632, 1973, 2335.5, 2698] },
+      { country: "Korea (Rep.)", region: "asia", rates: [1334, 1406, 1881, 1547, 1798.5, 2050] },
+      { country: "Kuwait", region: "middle-east", rates: [1139, 1239, 1436, 1804, 2157.5, 2511] },
+      { country: "Lao People's Dem. Rep.", region: "asia", rates: [873, 960, 1133, 1474, 1836.5, 2199] },
+      { country: "Lebanon", region: "middle-east", rates: [1497, 1584, 1756, 2098, 2460.5, 2823] },
+      { country: "Macao, China", region: "asia", rates: [1277, 1345, 1481, 1624, 1826.5, 2029] },
+      { country: "Malaysia", region: "asia", rates: [811, 892, 1052, 1318, 1593.5, 1869] },
+      { country: "Maldives", region: "asia", rates: [1122, 1210, 1382, 1704, 2057, 2410] },
+      { country: "Morocco", region: "africa", rates: [1122, 1210, 1382, 1858, 2288, 2718] },
+      { country: "Myanmar", region: "asia", rates: [873, 960, 1133, 1551, 1952, 2353] },
+      { country: "Nepal", region: "asia", rates: [935, 1023, 1195, 1854, 2406.5, 2959] },
+      { country: "Netherlands", region: "europe", rates: [2700, 2911, 3328, 2621, 3044, 3467] },
+      { country: "New Zealand (inc Ross Dependency)", region: "oceania", rates: [863, 926, 1049, 2351, 2836, 3321] },
+      { country: "Nigeria", region: "africa", rates: [1185, 1272, 1445, 2045, 2537, 3029] },
+      { country: "Norway", region: "europe", rates: [2249, 2337, 2509, 3127, 3628, 4129] },
+      { country: "Oman", region: "middle-east", rates: [1497, 1584, 1756, 2285, 2647.5, 3010] },
+      { country: "Pakistan", region: "asia", rates: [1122, 1210, 1382, 1705, 2058.5, 2412] },
+      { country: "Papua New Guinea", region: "oceania", rates: [1684, 1771, 1944, 2286, 2805, 3324] },
+      { country: "Qatar", region: "middle-east", rates: [1622, 1709, 1881, 2204, 2682, 3160] },
+      { country: "Saudi Arabia", region: "middle-east", rates: [1622, 1709, 1881, 2204, 2557.5, 2911] },
+      { country: "Singapore", region: "asia", rates: [718, 790, 932, 1167, 1407, 1647] },
+      { country: "South Africa", region: "africa", rates: [1372, 1460, 1632, 2335, 3003, 3671] },
+      { country: "Spain", region: "europe", rates: [2350, 2450, 2647, 3175, 3808.5, 4442] },
+      { country: "Sri Lanka", region: "asia", rates: [1068, 1162, 1347, 1795, 2196.5, 2598] },
+      { country: "Sweden", region: "europe", rates: [1622, 1709, 1881, 2495, 2994, 3493] },
+      { country: "Switzerland", region: "europe", rates: [1809, 1896, 2069, 2531, 2954, 3377] },
+      { country: "Taiwan", region: "asia", rates: [873, 960, 1132, 1418, 1753, 2088] },
+      { country: "Thailand", region: "asia", rates: [811, 892, 1052, 1318, 1593.5, 1869] },
+      { country: "United Arab Emirates (UAE)", region: "middle-east", rates: [1372, 1460, 1632, 1954, 2307.5, 2661] },
+      { country: "United Kingdom of Great Britain and Northern Ireland", region: "europe", rates: [1911, 1911, 1911, 3098, 3611.5, 4125] },
+      { country: "United States of America", region: "americas", rates: [2217, 2282, 2409, 3043, 3555, 4067] },
+      { country: "Viet Nam", region: "asia", rates: [873, 960, 1132, 1418, 1753, 2088] }
+    ];
+
+    // Function to format currency
+    function formatCurrency(amount) {
+      return "₱" + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Function to render the table
+    function renderTable(data) {
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = '';
+      
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        
+        // Country cell
+        const countryCell = document.createElement('td');
+        countryCell.className = 'country-col';
+        countryCell.textContent = item.country;
+        countryCell.dataset.country = item.country.toLowerCase();
+        row.appendChild(countryCell);
+        
+        // Rate cells
+        item.rates.forEach(rate => {
+          const rateCell = document.createElement('td');
+          rateCell.textContent = formatCurrency(rate);
+          row.appendChild(rateCell);
+        });
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Initial render
+    renderTable(ratesData);
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const regionFilter = document.getElementById('regionFilter');
+    
+    function filterTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const region = regionFilter.value;
+      
+      const filteredData = ratesData.filter(item => {
+        const matchesSearch = item.country.toLowerCase().includes(searchTerm);
+        const matchesRegion = region === 'all' || item.region === region;
+        return matchesSearch && matchesRegion;
+      });
+      
+      renderTable(filteredData);
+      
+      // Highlight search matches
+      if (searchTerm) {
+        const countryCells = document.querySelectorAll('.country-col');
+        countryCells.forEach(cell => {
+          const countryName = cell.dataset.country;
+          if (countryName.includes(searchTerm)) {
+            cell.classList.add('highlight');
+          } else {
+            cell.classList.remove('highlight');
+          }
+        });
+      }
+    }
+    
+    searchInput.addEventListener('input', filterTable);
+    regionFilter.addEventListener('change', filterTable);
+  </script>
+</body>
+</html>

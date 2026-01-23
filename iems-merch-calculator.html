@@ -1,0 +1,465 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMS Shipping Calculator</title>
+  <style>
+    :root {
+      --primary: #4a6bff;
+      --dark: #2c3e50;
+      --light: #f8f9fa;
+      --success: #28a745;
+      --warning: #ffc107;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7ff;
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      padding-right: 180px; /* Space for date-time */
+    }
+
+    .date-time {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-size: 14px;
+      color: #666;
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #e0e3ff;
+      white-space: nowrap;
+    }
+
+    .landscape-layout {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .input-panel, .output-panel {
+      flex: 1;
+      min-width: 0; /* Prevents flex items from overflowing */
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .dimension-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    label {
+      font-weight: 500;
+      color: var(--dark);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      padding: 12px 15px;
+      border: 2px solid #e0e3ff;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 100%;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    /* Checkbox styling */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-weight: 500;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #3a5bff;
+    }
+
+    .result {
+      padding: 20px;
+      background-color: #f0f4ff;
+      border-radius: 8px;
+      display: none;
+      overflow: hidden; /* Prevents content from overflowing */
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    .breakdown {
+      margin-top: 15px;
+      padding: 15px;
+      border: 1px dashed #ccc;
+      background: #ffffff;
+      border-radius: 8px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background: #fff;
+      table-layout: fixed; /* Ensures consistent column widths */
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    th {
+      background: #e8edff;
+      font-weight: 600;
+    }
+
+    .highlight {
+      background: #d4edda;
+      font-weight: bold;
+    }
+
+    .total-cost-display {
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 15px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid var(--primary);
+    }
+
+    .volumetric-note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+      padding-left: 26px; /* Align with checkbox */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .landscape-layout {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .date-time {
+        position: static;
+        text-align: center;
+        margin: 0 auto 15px;
+        max-width: 100%;
+        white-space: normal;
+      }
+      
+      h1 {
+        padding-right: 0;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+        margin: 15px auto;
+      }
+      
+      .dimension-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      
+      table {
+        font-size: 14px;
+      }
+      
+      th, td {
+        padding: 8px 5px;
+      }
+      
+      .checkbox-group {
+        gap: 8px;
+      }
+      
+      .volumetric-note {
+        padding-left: 26px;
+      }
+    }
+
+    /* Ensure long country names don't break layout */
+    select option {
+      white-space: normal;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="date-time">
+      <span id="currentDate"></span> <span id="currentTime"></span>
+    </div>
+
+    <h1>EMS Shipping Calculator</h1>
+
+    <div class="landscape-layout">
+      <div class="input-panel">
+        <div class="input-group">
+          <label for="country">Destination Country</label>
+          <select id="country">
+            <option disabled selected>Select country</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="weight">Actual Weight (kg)</label>
+          <input type="number" id="weight" step="0.1" min="0.1" placeholder="Enter actual weight" />
+        </div>
+
+        <div class="input-group">
+          <label>Package Dimensions (cm)</label>
+          <div class="dimension-grid">
+            <input type="number" id="length" placeholder="Length" min="1" />
+            <input type="number" id="width" placeholder="Width" min="1" />
+            <input type="number" id="height" placeholder="Height" min="1" />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="useVolumetric" />
+            <label for="useVolumetric">Use Volumetric Weight for Billing</label>
+          </div>
+          <p class="volumetric-note">Volumetric Divisor is fixed at <b>5000</b></p>
+        </div>
+
+        <button onclick="calculateShipping()">Calculate Cost</button>
+      </div>
+
+      <div class="output-panel">
+        <div class="result" id="result">
+          <h3>Shipping Cost Comparison</h3>
+          <div id="chargeableWeight" style="font-size:18px;font-weight:600;margin-bottom:10px;"></div>
+          <div id="totalCost" class="total-cost-display"></div>
+          <div class="breakdown" id="actualBreakdown"></div>
+          <div class="breakdown" id="volumetricBreakdown"></div>
+          
+          <table id="comparisonTable">
+            <!-- Table will be generated here -->
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      const dateString = now.toLocaleDateString('en-US', options);
+      let hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      const timeString = `${hours}:${minutes} ${ampm}`;
+      
+      document.getElementById('currentDate').textContent = `Today is ${dateString}`;
+      document.getElementById('currentTime').textContent = timeString;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+
+    const rates = {
+      "Australia": [2474, 444.50], "Austria": [2231, 507], "Bahrain (Kingdom)": [1973, 362.50],
+      "Bangladesh": [3048, 362.50], "Belgium": [2031, 454], "Brazil": [2592, 561],
+      "Brunei Darussalam": [1603, 306], "Bulgaria": [1809, 499], "Cambodia": [1418, 335],
+      "Canada": [2301, 593], "China (People's Rep.)": [1581, 467], "Cyprus": [2107, 492],
+      "Denmark": [2874, 501], "Egypt": [1845, 423], "Finland (inc. Aland Islands)": [2570, 499],
+      "France": [2031, 487], "Germany": [3093, 453.50], "Greece": [2094, 423],
+      "Hong Kong, China": [1141, 240], "India": [1755, 391], "Indonesia": [1217, 275.50],
+      "Iran (Islamic Rep.)": [2058, 405.50], "Ireland": [2219, 423], "Italy": [2386, 423],
+      "Japan": [2146, 335], "Jordan": [1973, 362.50], "Korea (Rep.)": [2167, 251.50],
+      "Kuwait": [1804, 353.50], "Lao People's Dem. Rep.": [1474, 362.50], "Lebanon": [2098, 362.50],
+      "Macao, China": [1624, 202.50], "Malaysia": [1318, 275.50], "Maldives": [1704, 353],
+      "Morocco": [1858, 430], "Myanmar": [1551, 401], "Nepal": [1854, 552.50],
+      "Netherlands": [2621, 423], "New Zealand (inc Ross Dependency)": [2351, 485],
+      "Nigeria": [2045, 492], "Norway": [3127, 501], "Oman": [2285, 362.50],
+      "Pakistan": [1705, 353.50], "Papua New Guinea": [2286, 519], "Qatar": [2204, 478],
+      "Saudi Arabia": [2204, 353.50], "Singapore": [1167, 240], "South Africa": [2335, 668],
+      "Spain": [3175, 633.50], "Sri Lanka": [1795, 401.50], "Sweden": [2495, 499],
+      "Switzerland": [2531, 423], "Taiwan": [1418, 335], "Thailand": [1318, 275.50],
+      "United Arab Emirates (UAE)": [1954, 353.50],
+      "United Kingdom Of Great Britain and Northern Ireland": [3098, 513.50],
+      "United States of America": [3043, 512], "Viet Nam": [1418, 335]
+    };
+
+    const countryDropdown = document.getElementById('country');
+    Object.keys(rates).sort().forEach(country => {
+      const option = document.createElement('option');
+      option.value = country;
+      option.textContent = country;
+      countryDropdown.appendChild(option);
+    });
+
+    function computeCostWithBreakdown(weight, rate) {
+      const [firstKg, per500g] = rate;
+      let total = firstKg;
+      let breakdown = `<p>First 1 kg: ₱${firstKg.toLocaleString()}</p>`;
+
+      if (weight > 1) {
+        const excess = weight - 1;
+        const units = Math.ceil(excess / 0.5);
+        const extra = units * per500g;
+        total += extra;
+        breakdown += `<p>Additional ${excess.toFixed(1)} kg (${units} × 500g):</p>`;
+        breakdown += `<p>${units} × ₱${per500g} = ₱${extra.toLocaleString()}</p>`;
+      }
+
+      return { total, breakdown };
+    }
+
+    function calculateShipping() {
+      const weight = parseFloat(document.getElementById('weight').value);
+      const length = parseFloat(document.getElementById('length').value);
+      const width = parseFloat(document.getElementById('width').value);
+      const height = parseFloat(document.getElementById('height').value);
+      const useVolumetric = document.getElementById('useVolumetric').checked;
+      const divisor = 5000;
+      const country = document.getElementById('country').value;
+
+      if (!country || isNaN(weight) || weight <= 0 || (useVolumetric && (isNaN(length) || isNaN(width) || isNaN(height)))) {
+        alert("Please complete all fields.");
+        return;
+      }
+
+      const volumetricWeight = useVolumetric ? (length * width * height) / divisor : 0;
+      const chargeableWeight = useVolumetric ? Math.max(weight, volumetricWeight) : weight;
+
+      const actual = computeCostWithBreakdown(weight, rates[country]);
+      const volumetric = useVolumetric ? computeCostWithBreakdown(volumetricWeight, rates[country]) : { total: 0, breakdown: '<p>Volumetric computation disabled</p>' };
+      const finalCost = computeCostWithBreakdown(chargeableWeight, rates[country]);
+
+      document.getElementById('chargeableWeight').innerHTML = `Chargeable Weight: <span style="color: var(--primary);">${chargeableWeight.toFixed(2)} kg</span>`;
+      
+      document.getElementById('totalCost').innerHTML = `Final EMS Cost: ₱${finalCost.total.toLocaleString()}`;
+
+      document.getElementById('actualBreakdown').innerHTML = `
+        <h4>Actual Weight Breakdown (${weight.toFixed(2)} kg)</h4>
+        ${actual.breakdown}`;
+
+      document.getElementById('volumetricBreakdown').innerHTML = `
+        <h4>Volumetric Weight Breakdown (${volumetricWeight.toFixed(2)} kg)</h4>
+        ${volumetric.breakdown}`;
+
+      document.getElementById('comparisonTable').innerHTML = `
+        <thead>
+          <tr>
+            <th style="width: 30%;">Type</th>
+            <th style="width: 35%;">Weight (kg)</th>
+            <th style="width: 35%;">Shipping Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="${weight >= volumetricWeight || !useVolumetric ? 'highlight' : ''}">
+            <td>Actual</td>
+            <td>${weight.toFixed(2)}</td>
+            <td>₱${actual.total.toLocaleString()}</td>
+          </tr>
+          <tr class="${volumetricWeight > weight && useVolumetric ? 'highlight' : ''}">
+            <td>Volumetric</td>
+            <td>${volumetricWeight.toFixed(2)}</td>
+            <td>₱${volumetric.total.toLocaleString()}</td>
+          </tr>
+        </tbody>`;
+
+      document.getElementById('result').classList.add('show');
+      
+      // Scroll to results on mobile
+      if (window.innerWidth < 900) {
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stamp Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5; 
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            background-color: #4361ee;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+            font-size: 30px
+        }
+        .sections-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .section {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section-title {
+            margin-top: 0;
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .row label {
+            width: 100px;
+            margin-bottom: 0;
+        }
+        .row input {
+            flex: 1;
+            width: auto;
+        }
+        .row span {
+            flex: 1;
+            text-align: right;
+            padding-right: 10px;
+        }
+        .results-section {
+            background-color: #f9f9f9;
+        }
+
+        @media (max-width: 900px) {
+            .sections-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stamp Calculator</h1>
+        
+        <div class="sections-container">
+            <!-- Left Column: Inventory -->
+            <div class="section">
+                <h2 class="section-title">Stamp Inventory</h2>
+                <div class="row">
+                    <label for="inv50">50 peso stamps:</label>
+                    <input type="number" id="inv50" min="0" value="100">
+                </div>
+                <div class="row">
+                    <label for="inv12">12 peso stamps:</label>
+                    <input type="number" id="inv12" min="0" value="100">
+                </div>
+                <div class="row">
+                    <label for="inv5">5 peso stamps:</label>
+                    <input type="number" id="inv5" min="0" value="100">
+                </div>
+                <div class="row">
+                    <label for="inv1">1 peso stamps:</label>
+                    <input type="number" id="inv1" min="0" value="100">
+                </div>
+                <button id="updateBtn">Update Inventory</button>
+            </div>
+            
+            <!-- Middle Column: Calculation -->
+            <div class="section">
+                <h2 class="section-title">Calculate Stamps</h2>
+                <div class="row">
+                    <label for="amount">Amount (peso):</label>
+                    <input type="number" id="amount" min="1" placeholder="Enter amount in peso">
+                </div>
+                <button id="calculateBtn">Calculate</button>
+            </div>
+            
+            <!-- Right Column: Results -->
+            <div class="section results-section">
+                <h2 class="section-title">Recommended Combination</h2>
+                <div class="row">
+                    <label>50 peso stamps:</label>
+                    <span id="result50" class="result">0</span>
+                </div>
+                <div class="row">
+                    <label>12 peso stamps:</label>
+                    <span id="result12" class="result">0</span>
+                </div>
+                <div class="row">
+                    <label>5 peso stamps:</label>
+                    <span id="result5" class="result">0</span>
+                </div>
+                <div class="row">
+                    <label>1 peso stamps:</label>
+                    <span id="result1" class="result">0</span>
+                </div>
+                <div class="row">
+                    <label>Total stamps:</label>
+                    <span id="resultTotal" class="result">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inventory object
+        const inventory = {
+            '50p': 100,
+            '12p': 100,
+            '5p': 100,
+            '1p': 100
+        };
+
+        // Update inventory from input fields
+        document.getElementById('updateBtn').addEventListener('click', function() {
+            inventory['50p'] = parseInt(document.getElementById('inv50').value) || 0;
+            inventory['12p'] = parseInt(document.getElementById('inv12').value) || 0;
+            inventory['5p'] = parseInt(document.getElementById('inv5').value) || 0;
+            inventory['1p'] = parseInt(document.getElementById('inv1').value) || 0;
+            
+            alert('Inventory updated successfully!');
+        });
+
+        // Calculate stamp combination
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const amount = parseInt(document.getElementById('amount').value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid positive amount');
+                return;
+            }
+            
+            const solution = findBestCombination(amount);
+            
+            if (!solution) {
+                alert('Not enough stamps to make this amount');
+                return;
+            }
+            
+            // Display results
+            document.getElementById('result50').textContent = solution['50p'];
+            document.getElementById('result12').textContent = solution['12p'];
+            document.getElementById('result5').textContent = solution['5p'];
+            document.getElementById('result1').textContent = solution['1p'];
+            document.getElementById('resultTotal').textContent = solution['total_stamps'];
+        });
+
+        // Algorithm to find best stamp combination
+        function findBestCombination(amount) {
+            let bestSolution = null;
+            let minStamps = Infinity;
+            
+            // Try all possible numbers of 50p stamps (from max possible down to 0)
+            const max50p = Math.min(Math.floor(amount / 50), inventory['50p']);
+            
+            for (let count50p = max50p; count50p >= Math.max(max50p - 50, 0); count50p--) {
+                const remainingAfter50p = amount - count50p * 50;
+                
+                // For the remaining amount, try all possible 12p stamps
+                const max12p = Math.min(Math.floor(remainingAfter50p / 12), inventory['12p']);
+                
+                for (let count12p = max12p; count12p >= Math.max(max12p - 12, 0); count12p--) {
+                    const remainingAfter12p = remainingAfter50p - count12p * 12;
+                    
+                    // For the remaining amount, try all possible 5p stamps
+                    const max5p = Math.min(Math.floor(remainingAfter12p / 5), inventory['5p']);
+                    
+                    for (let count5p = max5p; count5p >= Math.max(max5p - 5, 0); count5p--) {
+                        const remainingAfter5p = remainingAfter12p - count5p * 5;
+                        
+                        // The rest must be covered by 1p stamps
+                        if (remainingAfter5p < 0) continue;
+                        
+                        const count1p = remainingAfter5p;
+                        
+                        // Check if we have enough 1p stamps
+                        if (count1p > inventory['1p']) continue;
+                        
+                        const totalStamps = count50p + count12p + count5p + count1p;
+                        
+                        // Check if this is better than our current best solution
+                        if (totalStamps < minStamps) {
+                            minStamps = totalStamps;
+                            bestSolution = {
+                                '50p': count50p,
+                                '12p': count12p,
+                                '5p': count5p,
+                                '1p': count1p,
+                                'total_stamps': totalStamps
+                            };
+                        }
+                    }
+                }
+            }
+            
+            return bestSolution;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator 2025</title>
+    <style>
+        :root {
+            /* Default theme (Light) */
+            --bg-color: #f8f9fa;
+            --calculator-bg: #ffffff;
+            --display-bg: #f1f3f4;
+            --button-bg: #f1f3f4;
+            --button-hover: #e8eaeb;
+            --operator-bg: #dadce0;
+            --operator-hover: #d2d4d6;
+            --equals-bg: #4285f4;
+            --equals-hover: #3367d6;
+            --clear-bg: #f28b82;
+            --clear-hover: #d37067;
+            --text-color: #202124;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --history-bg: #ffffff;
+            --history-item: #f8f9fa;
+        }
+
+        /* Dark Theme */
+        .dark {
+            --bg-color: #202124;
+            --calculator-bg: #303134;
+            --display-bg: #525355;
+            --button-bg: #3c4043;
+            --button-hover: #4e5154;
+            --operator-bg: #5f6368;
+            --operator-hover: #70757a;
+            --equals-bg: #8ab4f8;
+            --equals-hover: #aecbfa;
+            --clear-bg: #f28b82;
+            --clear-hover: #f6aea6;
+            --text-color: #e8eaed;
+            --history-bg: #303134;
+            --history-item: #3c4043;
+        }
+
+        /* Ocean Theme */
+        .ocean {
+            --bg-color: #e6f7ff;
+            --calculator-bg: #ffffff;
+            --display-bg: #d4edff;
+            --button-bg: #e6f7ff;
+            --button-hover: #d4edff;
+            --operator-bg: #b3e0ff;
+            --operator-hover: #99d6ff;
+            --equals-bg: #0077cc;
+            --equals-hover: #005c99;
+            --clear-bg: #ff6666;
+            --clear-hover: #ff4d4d;
+            --text-color: #003366;
+            --history-bg: #ffffff;
+            --history-item: #e6f7ff;
+        }
+
+        /* Forest Theme */
+        .forest {
+            --bg-color: #e8f5e9;
+            --calculator-bg: #ffffff;
+            --display-bg: #c8e6c9;
+            --button-bg: #e8f5e9;
+            --button-hover: #d7efd8;
+            --operator-bg: #a5d6a7;
+            --operator-hover: #81c784;
+            --equals-bg: #2e7d32;
+            --equals-hover: #1b5e20;
+            --clear-bg: #ef9a9a;
+            --clear-hover: #e57373;
+            --text-color: #1b5e20;
+            --history-bg: #ffffff;
+            --history-item: #e8f5e9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .calculator-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .calculator {
+            width: 320px;
+            border-radius: 16px;
+            padding: 24px;
+            background-color: var(--calculator-bg);
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .calculator-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .current-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        #display {
+            width: calc(100% - 20px);
+            height: 60px;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-align: right;
+            padding: 0 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--display-bg);
+            color: var(--text-color);
+            outline: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        button {
+            height: 64px;
+            font-size: 1.25rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-1px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.operator {
+            background-color: var(--operator-bg);
+            font-size: 1.5rem;
+        }
+        
+        button.operator:hover {
+            background-color: var(--operator-hover);
+        }
+        
+        button.clear {
+            background-color: var(--clear-bg);
+            color: white;
+        }
+        
+        button.clear:hover {
+            background-color: var(--clear-hover);
+        }
+        
+        button.equals {
+            background-color: var(--equals-bg);
+            color: white;
+            font-size: 1.5rem;
+            grid-column: span 2;
+        }
+        
+        button.equals:hover {
+            background-color: var(--equals-hover);
+        }
+
+        .key-hint {
+            font-size: 0.75rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            text-align: center;
+            margin-top: 16px;
+            transition: color 0.3s;
+        }
+
+        .right-panel {
+            flex: 1;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .history-panel {
+            background-color: var(--history-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            max-height: 400px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-title {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .clear-history {
+            background-color: var(--clear-bg);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .clear-history:hover {
+            background-color: var(--clear-hover);
+        }
+
+        .history-items {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .history-item {
+            background-color: var(--history-item);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .history-equation {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .history-result {
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .theme-selector-container {
+            background-color: var(--calculator-bg);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-selector-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .theme-selector {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .theme-button {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+            text-align: left;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .theme-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .theme-button:after {
+            content: "";
+            display: inline-block;
+            width: 0;
+            height: 0;
+            margin-left: 8px;
+            border-top: 4px solid;
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+        }
+
+        .theme-dropdown {
+            display: none;
+            position: absolute;
+            background-color: var(--calculator-bg);
+            width: 100%;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            z-index: 1;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .theme-selector:hover .theme-dropdown {
+            display: block;
+        }
+
+        .theme-option {
+            color: var(--text-color);
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .theme-option:hover {
+            background-color: var(--button-hover);
+        }
+
+        .active-button {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--operator-bg);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--operator-hover);
+        }
+    </style>
+</head>
+<body class="light">
+    <div class="calculator-container">
+        <div class="calculator">
+            <div class="calculator-header">
+                <div class="current-date" id="current-date"></div>
+            </div>
+            
+            <input type="text" id="display" readonly tabindex="-1">
+            <div class="buttons">
+                <button class="clear" onclick="clearDisplay()">C</button>
+                <button onclick="appendToDisplay('/')">/</button>
+                <button onclick="appendToDisplay('*')">x</button>
+                <button onclick="backspace()">DEL</button>
+                <button onclick="appendToDisplay('7')">7</button>
+                <button onclick="appendToDisplay('8')">8</button>
+                <button onclick="appendToDisplay('9')">9</button>
+                <button class="operator" onclick="appendToDisplay('-')">-</button>
+                <button onclick="appendToDisplay('4')">4</button>
+                <button onclick="appendToDisplay('5')">5</button>
+                <button onclick="appendToDisplay('6')">6</button>
+                <button class="operator" onclick="appendToDisplay('+')">+</button>
+                <button onclick="appendToDisplay('1')">1</button>
+                <button onclick="appendToDisplay('2')">2</button>
+                <button onclick="appendToDisplay('3')">3</button>
+                <button class="equals" onclick="calculate()">=</button>
+                <button onclick="appendToDisplay('0')">0</button>
+                <button onclick="appendToDisplay('.')">.</button>
+            </div>
+            <div class="key-hint">Press Enter for equals, Escape to clear</div>
+        </div>
+
+        <div class="right-panel">
+            <div class="history-panel">
+                <div class="history-header">
+                    <div class="history-title">Calculation History</div>
+                    <button class="clear-history" onclick="clearHistory()">Clear</button>
+                </div>
+                <div class="history-items" id="history-items">
+                    <!-- History items will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="theme-selector-container">
+                <div class="theme-selector-title">Theme</div>
+                <div class="theme-selector">
+                    <button class="theme-button">Select Theme</button>
+                    <div class="theme-dropdown">
+                        <a href="#" class="theme-option" onclick="setTheme('light'); return false;">Light</a>
+                        <a href="#" class="theme-option" onclick="setTheme('dark'); return false;">Dark</a>
+                        <a href="#" class="theme-option" onclick="setTheme('ocean'); return false;">Ocean</a>
+                        <a href="#" class="theme-option" onclick="setTheme('forest'); return false;">Forest</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const historyItems = document.getElementById('history-items');
+        const currentDate = document.getElementById('current-date');
+        const themeButton = document.querySelector('.theme-button');
+        
+        // Initialize calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            loadHistory();
+            loadTheme();
+        });
+        
+        // Update current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDate.textContent = `Today is ${now.toLocaleDateString('en-US', options)}`;
+        }
+        
+        // Button functions
+        function appendToDisplay(value) {
+            display.value += value;
+            animateButton(value);
+        }
+        
+        function clearDisplay() {
+            display.value = '';
+            animateButton('C');
+        }
+        
+        function backspace() {
+            display.value = display.value.slice(0, -1);
+            animateButton('DEL');
+        }
+        
+        function calculate() {
+            try {
+                const expression = display.value;
+                const result = eval(expression);
+                const formattedResult = Number.isInteger(result) ? result : parseFloat(result.toFixed(10));
+                
+                display.value = formattedResult;
+                animateButton('=');
+                
+                // Add to history
+                addToHistory(expression, formattedResult);
+            } catch (error) {
+                display.value = 'Error';
+            }
+        }
+        
+        // History functions
+        function addToHistory(equation, result) {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div class="history-equation">${equation}</div>
+                <div class="history-result">= ${result}</div>
+            `;
+            
+            historyItems.insertBefore(historyItem, historyItems.firstChild);
+            
+            // Save to localStorage
+            saveHistory();
+        }
+        
+        function clearHistory() {
+            historyItems.innerHTML = '';
+            saveHistory();
+        }
+        
+        function saveHistory() {
+            const items = [];
+            document.querySelectorAll('.history-item').forEach(item => {
+                items.push({
+                    equation: item.querySelector('.history-equation').textContent,
+                    result: item.querySelector('.history-result').textContent
+                });
+            });
+            localStorage.setItem('calculatorHistory', JSON.stringify(items));
+        }
+        
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('calculatorHistory');
+            if (savedHistory) {
+                const items = JSON.parse(savedHistory);
+                items.reverse().forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-equation">${item.equation}</div>
+                        <div class="history-result">${item.result}</div>
+                    `;
+                    historyItems.appendChild(historyItem);
+                });
+            }
+        }
+        
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            // Prevent default for calculator keys
+            if (/[0-9\.\+\-\*\/]/.test(key) || 
+                key === 'Enter' || 
+                key === 'Escape' || 
+                key === 'Backspace' ||
+                key === '=' ||
+                key === 'Delete') {
+                event.preventDefault();
+            }
+            
+            if (/[0-9]/.test(key)) {
+                appendToDisplay(key);
+            } else if (key === '.') {
+                appendToDisplay('.');
+            } else if (key === '+') {
+                appendToDisplay('+');
+            } else if (key === '-') {
+                appendToDisplay('-');
+            } else if (key === '*' || key === 'x') {
+                appendToDisplay('*');
+            } else if (key === '/') {
+                appendToDisplay('/');
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            } else if (key === 'Backspace' || key === 'Delete') {
+                backspace();
+            }
+        });
+
+        // Button animation
+        function animateButton(value) {
+            let button;
+            
+            // Special cases
+            if (value === 'C') {
+                button = document.querySelector('.clear');
+            } else if (value === 'DEL') {
+                const buttons = document.querySelectorAll('button');
+                for (let btn of buttons) {
+                    if (btn.textContent === 'DEL') {
+                        button = btn;
+                        break;
+                    }
+                }
+            } else if (value === '=') {
+                button = document.querySelector('.equals');
+            } else {
+                // Find button with matching text content
+                const buttons = document.querySelectorAll('button');
+                for (let btn of buttons) {
+                    if (btn.textContent === value) {
+                        button = btn;
+                        break;
+                    }
+                }
+            }
+            
+            if (button) {
+                button.classList.add('active-button');
+                setTimeout(() => {
+                    button.classList.remove('active-button');
+                }, 100);
+            }
+        }
+
+        // Theme switching
+        function setTheme(theme) {
+            document.body.className = theme;
+            themeButton.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
+            saveTheme(theme);
+        }
+        
+        function saveTheme(theme) {
+            localStorage.setItem('calculatorTheme', theme);
+        }
+        
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('calculatorTheme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            }
+        }
+    </script>
+</body>
+</html>
